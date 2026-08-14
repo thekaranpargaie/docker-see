@@ -1,6 +1,8 @@
 # DockerSee
 
 **See your Docker architecture.**
+<img width="1660" height="972" alt="image" src="https://github.com/user-attachments/assets/7302e212-9780-4b36-9efa-524d44114eb2" />
+
 
 DockerSee is a Visual Studio Code extension that reads your Docker Compose files and turns them into an
 interactive architecture diagram — services, dependencies, networks, volumes, ports, images and build
