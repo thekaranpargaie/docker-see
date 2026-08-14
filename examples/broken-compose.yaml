@@ -1,0 +1,21 @@
+# Deliberately broken file used to exercise DockerSee's error handling (spec §16).
+services:
+  api:
+    image: my-api:latest
+    ports:
+      - "not-a-port:8080"
+    depends_on:
+      - postgres
+      - cache          # <- no such service
+    networks:
+      - backend        # <- never declared
+    volumes:
+      - db-data:/data  # <- never declared
+
+  postgres:
+    # neither image nor build
+    container_name: demo-api
+
+  legacy:
+    image: busybox
+    container_name: demo-api   # <- duplicate container name

@@ -1,0 +1,246 @@
+{
+  "name": "dockersee",
+  "displayName": "DockerSee",
+  "description": "See your Docker architecture. Turns Docker Compose files into an interactive architecture diagram inside VS Code.",
+  "version": "0.1.0",
+  "publisher": "dockersee",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0",
+    "node": ">=18"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "docker",
+    "docker-compose",
+    "compose",
+    "architecture",
+    "diagram",
+    "graph",
+    "visualization"
+  ],
+  "icon": "media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thekaranpargaie/docker-see.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thekaranpargaie/docker-see/issues"
+  },
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onWebviewPanel:dockersee.graph"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "dockersee.visualizeCompose",
+        "title": "Visualize Compose",
+        "category": "DockerSee",
+        "icon": "$(type-hierarchy)"
+      },
+      {
+        "command": "dockersee.selectComposeFile",
+        "title": "Select Compose File...",
+        "category": "DockerSee"
+      },
+      {
+        "command": "dockersee.refresh",
+        "title": "Refresh Diagram",
+        "category": "DockerSee",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "dockersee.resetLayout",
+        "title": "Reset Layout",
+        "category": "DockerSee"
+      },
+      {
+        "command": "dockersee.fitView",
+        "title": "Fit Graph To Screen",
+        "category": "DockerSee"
+      },
+      {
+        "command": "dockersee.search",
+        "title": "Search Service",
+        "category": "DockerSee"
+      },
+      {
+        "command": "dockersee.exportPng",
+        "title": "Export Diagram as PNG",
+        "category": "DockerSee"
+      },
+      {
+        "command": "dockersee.exportSvg",
+        "title": "Export Diagram as SVG",
+        "category": "DockerSee"
+      },
+      {
+        "command": "dockersee.showLog",
+        "title": "Show Log",
+        "category": "DockerSee"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "dockersee.visualizeCompose",
+          "when": "resourceFilename =~ /^(docker-)?compose([.\\w-]+)?\\.ya?ml$/",
+          "group": "navigation@99"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "dockersee.visualizeCompose",
+          "when": "resourceFilename =~ /^(docker-)?compose([.\\w-]+)?\\.ya?ml$/",
+          "group": "navigation@99"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "dockersee.visualizeCompose",
+          "when": "resourceFilename =~ /^(docker-)?compose([.\\w-]+)?\\.ya?ml$/",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "dockersee.refresh",
+          "when": "dockersee.panelActive"
+        },
+        {
+          "command": "dockersee.resetLayout",
+          "when": "dockersee.panelActive"
+        },
+        {
+          "command": "dockersee.fitView",
+          "when": "dockersee.panelActive"
+        },
+        {
+          "command": "dockersee.search",
+          "when": "dockersee.panelActive"
+        },
+        {
+          "command": "dockersee.exportPng",
+          "when": "dockersee.panelActive"
+        },
+        {
+          "command": "dockersee.exportSvg",
+          "when": "dockersee.panelActive"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "DockerSee",
+      "properties": {
+        "dockersee.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically rebuild the diagram when the Compose file changes."
+        },
+        "dockersee.refreshDelay": {
+          "type": "number",
+          "default": 300,
+          "minimum": 0,
+          "maximum": 5000,
+          "description": "Debounce delay (ms) applied before rebuilding the diagram after a change."
+        },
+        "dockersee.layoutDirection": {
+          "type": "string",
+          "enum": [
+            "TB",
+            "LR",
+            "BT",
+            "RL"
+          ],
+          "enumDescriptions": [
+            "Top to bottom",
+            "Left to right",
+            "Bottom to top",
+            "Right to left"
+          ],
+          "default": "TB",
+          "description": "Direction used by the automatic layout."
+        },
+        "dockersee.networkDisplay": {
+          "type": "string",
+          "enum": [
+            "nodes",
+            "groups",
+            "badges",
+            "hidden"
+          ],
+          "enumDescriptions": [
+            "Render each network as its own graph node",
+            "Render networks as translucent groups around their services",
+            "Render networks only as badges on the service node",
+            "Do not render networks in the graph"
+          ],
+          "default": "nodes",
+          "description": "How networks are represented in the diagram."
+        },
+        "dockersee.showVolumes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Render volumes as graph nodes connected to the services that mount them."
+        },
+        "dockersee.showDefaultNetwork": {
+          "type": "boolean",
+          "default": false,
+          "description": "Render the implicit `default` network that Compose attaches services to when they declare no network."
+        },
+        "dockersee.showBindMounts": {
+          "type": "boolean",
+          "default": false,
+          "description": "Also render bind mounts (host paths) as volume nodes, not just named volumes."
+        },
+        "dockersee.highlightDependencies": {
+          "type": "boolean",
+          "default": true,
+          "description": "Dim unrelated nodes and highlight direct dependencies when a service is selected."
+        },
+        "dockersee.showMinimap": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the minimap in the bottom right corner of the diagram."
+        },
+        "dockersee.interpolateVariables": {
+          "type": "boolean",
+          "default": true,
+          "description": "Resolve ${VARIABLE} references using the .env file next to the Compose file and the extension host environment."
+        },
+        "dockersee.envFile": {
+          "type": "string",
+          "default": ".env",
+          "description": "Environment file (relative to the Compose file) used for variable interpolation."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "postinstall": "cd webview && npm install --no-audit --no-fund",
+    "build": "npm run build:webview && npm run build:extension",
+    "build:extension": "node esbuild.js --production",
+    "build:webview": "cd webview && npm run build",
+    "watch:extension": "node esbuild.js --watch",
+    "watch:webview": "cd webview && npm run watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit && cd webview && npm run typecheck",
+    "compile-tests": "tsc -p tsconfig.test.json",
+    "test": "npm run compile-tests && node --test \"out/test/*.test.js\"",
+    "vscode:prepublish": "npm run build",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "yaml": "^2.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.32.0",
+    "esbuild": "^0.23.1",
+    "typescript": "^5.5.4"
+  }
+}

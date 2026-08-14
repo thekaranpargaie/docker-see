@@ -1,0 +1,15 @@
+node_modules/
+dist/
+out/
+*.vsix
+.DS_Store
+*.log
+.vscode-test/
+
+# Local scratch files
+temp-*.md
+
+# Diagrams exported from the extension
+*-architecture.png
+*-architecture.svg
+
